@@ -10,19 +10,15 @@
 (deftest test-pair
   (testing "Making pairs from"
     (testing "an empty sequence"
-      (is (= '()
-             (pair nil)))
-      (is (= '()
-             (pair '()))))
+      (are [e a] (= e (pair a))
+        '() nil
+        '() '()))
     (testing "an even-length sequence"
-      (is (= '((:a :b))
-             (pair '(:a :b))))
-      (is (= '((:a :b) (:c :d))
-             (pair '(:a :b :c :d)))))
+      (are [e a] (= e (pair a))
+        '((:a :b)) '(:a :b)
+        '((:a :b) (:c :d)) '(:a :b :c :d)))
     (testing "an odd-length sequence"
-      (is (= '((:a))
-             (pair '(:a))))
-      (is (= '((:a :b :c))
-             (pair '(:a :b :c))))
-      (is (= '((:a :b :c) (:d :e))
-             (pair '(:a :b :c :d :e)))))))
+      (are [e a] (= e (pair a))
+        '((:a)) '(:a)
+        '((:a :b :c)) '(:a :b :c)
+        '((:a :b :c) (:d :e)) '(:a :b :c :d :e)))))
