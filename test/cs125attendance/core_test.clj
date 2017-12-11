@@ -24,5 +24,5 @@
              (pair '(:a))))
       (is (= '((:a :b :c))
              (pair '(:a :b :c))))
-      (is (= '((:a :b) (:c :d :e))
+      (is (= '((:a :b :c) (:d :e))
              (pair '(:a :b :c :d :e)))))))
