@@ -9,9 +9,7 @@
 (defn pair
   "Make sequential pairs from a sequence."
   [s]
-  (if (= 0 (mod (count s) 2))
+  (if (even? (count s))
     (partition 2 s)
-    (if (= 1 (count s))
-      (list s)
-      (concat (list (take 3 s))
-              (partition 2 (drop 3 s))))))
+    (concat (list (take 3 s))
+            (partition 2 (drop 3 s)))))
