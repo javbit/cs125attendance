@@ -6,6 +6,14 @@
   [& args]
   (println "Hello, World!"))
 
+(use 'clojure.java.io)
+    
+(defn import
+  "Import text file into sequence"
+  [f]
+  (with-open [r (reader f)]
+    (doall (line-seq r))))
+    
 (defn pair
   "Make sequential pairs from a sequence."
   [s]
