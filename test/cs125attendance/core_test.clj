@@ -22,3 +22,34 @@
         '((:a)) '(:a)
         '((:a :b :c)) '(:a :b :c)
         '((:a :b :c) (:d :e)) '(:a :b :c :d :e)))))
+
+;; Splitting a triple into tuples. This one does all possible pairs.
+(deftest test-edges
+  (testing "Splitting"
+    (testing "an empty sequence"
+      (are [e a] (= e (edges a))
+        '() nil
+        '() '()))
+    (testing "a tuple"
+      (is (= '((:a :b))
+             (edges '(:a :b)))))
+    (testing "a triple"
+      (is (= #{'(:a :b) '(:b :c) '(:c :a)}
+             (set (edges '(:a :b :c))))))))
+
+;; Strict pairing that has no triples
+(deftest test-pair*
+  (testing "Strict pairings from"
+    (testing "an empty sequence"
+      (are [e a] (= e (pair* a))
+        '() nil
+        '() '()))
+    (testing "an even-length sequence"
+      (are [e a] (= e (pair* a))
+        '((:a :b)) '(:a :b)
+        '((:a :b) (:c :d)) '(:a :b :c :d)))
+    (testing "an odd-length sequence"
+      (is (= '((:a)) (pair* '(:a))))
+      (are [e a] (= e (set (pair* a)))
+        #{'(:a :b) '(:b :c) '(:c :a)} '(:a :b :c)
+        #{'(:a :b) '(:b :c) '(:c :a) '(:d :e)} '(:a :b :c :d :e)))))
