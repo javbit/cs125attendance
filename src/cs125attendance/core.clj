@@ -25,6 +25,14 @@
     (concat (list (take 3 s))
             (partition 2 (drop 3 s)))))
 
+(defn pair*
+  "Strict sequential pairing with no triples."
+  [s]
+  (let [raw (pair s)]
+    (if (let [c (count s)] (or (= 1 c) (even? c)))
+      raw
+      (concat (edges (first raw)) (rest raw)))))
+
 (defn edges
   "Split a triple into tuples encoding the edges."
   [t]
@@ -33,14 +41,6 @@
     (if (even? (count t))
          (list t)
          (take 3 (partition 2 (cycle t))))))
-
-(defn pair*
-  "Strict sequential pairing with no triples."
-  [s]
-  (let [raw (pair s)]
-    (if (let [c (count s)] (or (= 1 c) (even? c)))
-      raw
-      (concat (edges (first raw)) (rest raw)))))
 
 (defn mkreq
   "Make the request data for post."
