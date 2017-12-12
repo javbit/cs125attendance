@@ -1,5 +1,8 @@
 (ns cs125attendance.core
+  (:require [clj-http.client :as client])
   (:gen-class))
+
+(def endpoint "http://cs125class.web.engr.illinois.edu/processfeedback.php")
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -39,7 +42,20 @@
       raw
       (concat (edges (first raw)) (rest raw)))))
 
-(defn post
-  "Send http post request to the API"
-  [s]
-  (doseq s (http/post 'https://cs125.cs.illinois.edu/processfeedback.php' {:body (json-str {:yournetid (get s 0), theirnetid (get s 1), lecturerating 9, understand '', struggle ''})})))
+(defn mkreq
+  "Make the request data for post."
+  [myid partnerid rating & {:keys [understand struggle] :or {understand "" struggle ""}}]
+  {:form-params {:yournetid myid
+                 :theirnetid partnerid
+                 :lecturerating rating
+                 :understand understand
+                 :struggle struggle}
+   :content-type :json})
+
+(defn mkposts
+  "Make POSTs to endpoint."
+  [pairs endpoint]
+  (doseq [[a b] pairs]
+    (let [double (list (list a b) (list b a))]
+      (doseq [[x y] double]
+        (client/post endpoint (mkreq x y (+ 1 (rand-int 10))))))))
