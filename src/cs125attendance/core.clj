@@ -7,12 +7,12 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (mkposts (pair* (import ("netIDs.txt")) endpoint)))
 
 (use 'clojure.java.io)
     
 (defn import
-  "Import text file into sequence"
+  "Import text file into sequence."
   [f]
   (with-open [r (reader f)]
     (doall (line-seq r))))
