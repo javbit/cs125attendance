@@ -1,22 +1,14 @@
 (ns cs125attendance.core
-  (:require [clj-http.client :as client])
-  (:gen-class))
+  (:gen-class)
+  (:require [clj-http.client :as client]
+            [clojure.java.io :as io]))
 
-(def endpoint "http://cs125class.web.engr.illinois.edu/processfeedback.php")
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (mkposts (pair* (import ("netIDs.txt")) endpoint)))
-
-(use 'clojure.java.io)
-    
-(defn import
+(defn read-netids
   "Import text file into sequence."
   [f]
-  (with-open [r (reader f)]
+  (with-open [r (io/reader f)]
     (doall (line-seq r))))
-    
+
 (defn pair
   "Make sequential pairs from a sequence."
   [s]
@@ -24,6 +16,15 @@
     (partition 2 s)
     (concat (list (take 3 s))
             (partition 2 (drop 3 s)))))
+
+(defn edges
+  "Split a triple into tuples encoding the edges."
+  [t]
+  (if (or (nil? t) (empty? t))
+    '()
+    (if (even? (count t))
+      (list t)
+      (take 3 (partition 2 (cycle t))))))
 
 (defn pair*
   "Strict sequential pairing with no triples."
@@ -33,18 +34,10 @@
       raw
       (concat (edges (first raw)) (rest raw)))))
 
-(defn edges
-  "Split a triple into tuples encoding the edges."
-  [t]
-  (if (or (nil? t) (empty? t))
-    '()
-    (if (even? (count t))
-         (list t)
-         (take 3 (partition 2 (cycle t))))))
-
 (defn mkreq
   "Make the request data for post."
-  [myid partnerid rating & {:keys [understand struggle] :or {understand "" struggle ""}}]
+  [myid partnerid rating & {:keys [understand struggle]
+                            :or {understand "" struggle ""}}]
   {:form-params {:yournetid myid
                  :theirnetid partnerid
                  :lecturerating rating
@@ -54,8 +47,15 @@
 
 (defn mkposts
   "Make POSTs to endpoint."
-  [pairs endpoint]
+  [endpoint pairs]
   (doseq [[a b] pairs]
     (let [double (list (list a b) (list b a))]
       (doseq [[x y] double]
         (client/post endpoint (mkreq x y (+ 1 (rand-int 10))))))))
+
+(defn -main
+  "Runs the whole attendence process."
+  [& args]
+  (def endpoint "http://cs125class.web.engr.illinois.edu/processfeedback.php")
+  (def netids "resources/netids.txt")
+  (mkposts endpoint (pair* (shuffle (read-netids netids)))))
